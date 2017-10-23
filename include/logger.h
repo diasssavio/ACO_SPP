@@ -2,7 +2,7 @@
 // Name        : logger.h
 // Author      : Sávio S. Dias
 // E-mail      : diasssavio@gmail.com
-// Institution : Universidade Federal Fluminense
+// Institution : Federal University of Rio de Janeiro
 // Description : Logger class interface
 //============================================================================
 
