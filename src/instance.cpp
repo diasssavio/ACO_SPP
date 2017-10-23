@@ -11,7 +11,8 @@
 instance::instance() { }
 
 instance::instance( unsigned _n, unsigned _m ) : n(_n), m(_m) {
-	// TODO
+	weights = vector< unsigned >(m);
+	subsets = vector< vector< unsigned > >(m);
 }
 
 instance::~instance() { }
@@ -33,13 +34,52 @@ const vector< unsigned >& instance::get_weights() const { return this->weights; 
 const vector< vector < unsigned > >& instance::get_subsets() const { return this->subsets; }
 
 void instance::read_data() {
-	// TODO
+	scanf("%d %d", &n, &m);
+
+	weights = vector< unsigned >(m);
+	subsets = vector< vector< unsigned > >(m);
+
+	for(int i = 0; i < m; i++) {
+		unsigned aux;
+		scanf("%d %d", &weights[i], &aux);
+		vector< unsigned > line(aux);
+		for(int j = 0; j < aux; j++)
+			scanf("%d", &line[j]);
+		subsets[i] = line;
+	}
 }
 
 void instance::read_from_file(const string& file_name) {
-  // TODO
+	ifstream _file;
+  _file.open(file_name.c_str(), std::ifstream::in);
+
+  if(_file.is_open()) {
+    _file >> n >> m;
+
+		weights = vector< unsigned >(m);
+		subsets = vector< vector< unsigned > >(m);
+
+    for(unsigned i = 0; i < m; i++) {
+			unsigned aux;
+			_file >> weights[i] >> aux;
+			vector< unsigned > line(aux);
+			for(int j = 0; j < aux; j++)
+				_file >> line[j];
+			subsets[i] = line;
+		}
+
+    _file.close();
+  }
 }
 
 void instance::show_data() {
-	// TODO
+	printf(" --------------------------------------- \n");
+	printf("%d %d\n", n, m);
+	for(int i = 0; i < m; i++) {
+		printf("%d <-> ", weights[i]);
+		for(int j = 0; j < subsets[i].size(); j++)
+			printf("%d ", subsets[i][j]);
+		printf("\n");
+	}
+	printf(" --------------------------------------- \n");
 }

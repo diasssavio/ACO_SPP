@@ -46,6 +46,7 @@ int main(int argc, char* args[]) {
 	instance spp;
 	// spp.read_data();
   spp.read_from_file(args[1]);
+	spp.show_data();
 
   double alpha = 0.47;
 	unsigned max_it = 61;
@@ -55,12 +56,12 @@ int main(int argc, char* args[]) {
 		n_neigh = string_to< unsigned >(args[3]) - 1;
 
 	logger* logs = new logger(timer);
-	aco ACO(spp, max_it, alpha, logs);
+	// aco ACO(spp, max_it, alpha, logs);
 
 	// Executing individual neighborhoods
-	solution best = ACO.execute();
+	// solution best = ACO.execute();
 	timer.stop();
-	printf("%s;%d;%.2lf;%.2lf;%d;%.2lf;\n", args[1], n_neigh + 1, best.get_cost(), logs->best_time(), logs->get_individual_log(), logs->get_individual_average());
+	// printf("%s;%d;%.2lf;%.2lf;%d;%.2lf;\n", args[1], n_neigh + 1, best.get_cost(), logs->best_time(), logs->get_individual_log(), logs->get_individual_average());
 
 	return 0;
 }
