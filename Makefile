@@ -58,7 +58,7 @@ CONCERTINCDIR = $(CONCERTDIR)/include
 CCFLAGS = $(CCOPT)
 
 # Executable name
-CPP_EX = CaRS-ILS
+CPP_EX = ACO_SPP
 
 # Compiling
 all:
