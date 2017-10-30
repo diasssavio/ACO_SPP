@@ -15,6 +15,7 @@
 #include <ctime>
 #include <cstring>
 
+#include "../include/typedef.hpp"
 #include "../include/FWChrono.h"
 #include "../include/logger.h"
 #include "../include/mt19937ar.h"
@@ -23,14 +24,6 @@
 #include "../include/aco.h"
 
 using namespace std;
-
-template<typename T>
-T string_to(const string& s){
-	istringstream i(s);
-	T x;
-	if (!(i >> x)) return 0;
-	return x;
-}
 
 int main(int argc, char* args[]) {
 	FWChrono timer;
@@ -44,21 +37,24 @@ int main(int argc, char* args[]) {
 	init_genrand(seed);
 
 	instance spp;
-	// spp.read_data();
   spp.read_from_file(args[1]);
-	spp.show_data();
+	#if LOGS == true
+		spp.show_data();
+	#endif
 
-  double alpha = 0.47;
-	unsigned max_it = 61;
+  double alpha = 1;
+	double beta = 1;
+	double big_Q = 0.5;
+	unsigned max_it = 50;
 
 	unsigned n_neigh = 0;
 	if(argc >= 4)
 		n_neigh = string_to< unsigned >(args[3]) - 1;
 
 	logger* logs = new logger(timer);
-	// aco ACO(spp, max_it, alpha, logs);
+	aco ACO(spp, max_it, alpha, beta, big_Q, logs);
 
-	// Executing individual neighborhoods
+	// Executing Ant Colony Optimization algorithm
 	// solution best = ACO.execute();
 	timer.stop();
 	// printf("%s;%d;%.2lf;%.2lf;%d;%.2lf;\n", args[1], n_neigh + 1, best.get_cost(), logs->best_time(), logs->get_individual_log(), logs->get_individual_average());

@@ -9,6 +9,7 @@
 #ifndef ACO_H_
 #define ACO_H_
 
+#include "typedef.hpp"
 #include "instance.h"
 #include "solution.h"
 #include "neighborhoods.h"
@@ -16,11 +17,13 @@
 #include "mt19937ar.h"
 
 #include <utility>
+#include <set>
+#include <vector>
 #include <algorithm>
 #include <numeric>
+#include <limits>
 #include <cstdlib>
 #include <ctime>
-#include <limits>
 #include <cmath>
 
 using namespace std;
@@ -29,7 +32,8 @@ class aco {
 private:
 	// Parameters
 	unsigned max_it;
-	double alpha;
+	double alpha, beta;
+	double big_Q;
 
 	// Input instance
 	instance spp;
@@ -37,11 +41,22 @@ private:
 	// Result best solution
 	solution best;
 
+	// ACO data
+	vector< vector< double > > pheromones;
+	vector< vector< double > > heuristics;
+	vector< solution > ants;
+
+	// Neighbors
+	vector< vector< unsigned > > neighbors;
+
+	// Utils
+	double get_heuristic( unsigned, unsigned );
+
 	// Logs
 	logger* logs;
 
 public:
-	aco( instance&, unsigned, double, logger* );
+	aco( instance&, unsigned, double, double, double, logger* );
 	virtual ~aco();
 
 	solution& execute();

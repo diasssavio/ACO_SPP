@@ -9,8 +9,9 @@
 #ifndef INSTANCE_H_
 #define INSTANCE_H_
 
-#include <cstdio>
 #include <vector>
+#include <algorithm>
+#include <cstdio>
 #include <fstream>
 
 using namespace std;
@@ -27,6 +28,8 @@ private:
 	vector< unsigned > weights; // Weights of every subset
 	vector< vector < unsigned > > subsets; // Itens in every subset
 
+	unsigned big_M; // Biggest value of weights vector
+
 public:
 	// Constructors & Destructors
 	instance();
@@ -42,8 +45,11 @@ public:
 	// Getters
 	unsigned get_n();
 	unsigned get_m();
+	unsigned get_big_M();
 	const vector< unsigned >& get_weights() const;
 	const vector< vector < unsigned > >& get_subsets() const;
+	unsigned get_weight( unsigned );
+	const vector< unsigned >& get_subset( unsigned ) const;
 
 	// Useful Methods
 	void read_data();

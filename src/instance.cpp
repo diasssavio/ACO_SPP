@@ -13,6 +13,7 @@ instance::instance() { }
 instance::instance( unsigned _n, unsigned _m ) : n(_n), m(_m) {
 	weights = vector< unsigned >(m);
 	subsets = vector< vector< unsigned > >(m);
+	big_M = *max_element(weights.begin(), weights.end());
 }
 
 instance::~instance() { }
@@ -33,6 +34,10 @@ const vector< unsigned >& instance::get_weights() const { return this->weights; 
 
 const vector< vector < unsigned > >& instance::get_subsets() const { return this->subsets; }
 
+unsigned instance::get_weight( unsigned index ) { return this->weights[index]; }
+
+const vector< unsigned >& instance::get_subset( unsigned index ) const { return this->subsets[index]; }
+
 void instance::read_data() {
 	scanf("%d %d", &n, &m);
 
@@ -47,6 +52,8 @@ void instance::read_data() {
 			scanf("%d", &line[j]);
 		subsets[i] = line;
 	}
+
+	big_M = *max_element(weights.begin(), weights.end());
 }
 
 void instance::read_from_file(const string& file_name) {
@@ -70,10 +77,12 @@ void instance::read_from_file(const string& file_name) {
 
     _file.close();
   }
+
+	big_M = *max_element(weights.begin(), weights.end());
 }
 
 void instance::show_data() {
-	printf(" --------------------------------------- \n");
+	printf("INSTANCE DATA -------------------------- \n");
 	printf("%d %d\n", n, m);
 	for(int i = 0; i < m; i++) {
 		printf("%d <-> ", weights[i]);
