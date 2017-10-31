@@ -67,7 +67,8 @@ double aco::get_heuristic( unsigned i, unsigned j ) {
 	} else {
 		set< unsigned > union_set(spp.get_subset(i - 1).begin(), spp.get_subset(i - 1).end());
 		union_set.insert(spp.get_subset(j - 1).begin(), spp.get_subset(j - 1).end());
-		heuristics[i][j] = (spp.get_weight(i - 1) + spp.get_weight(j - 1)) / (double)union_set.size();
+		double intersec_size = spp.get_subset(i - 1).size() + spp.get_subset(j - 1).size() - union_set.size();
+		heuristics[i][j] = (spp.get_weight(i - 1) + spp.get_weight(j - 1) + spp.get_big_M() * intersec_size) / (double)union_set.size();
 		heuristics[i][j] = 1.0 / heuristics[i][j];
 	}
 	return heuristics[i][j];

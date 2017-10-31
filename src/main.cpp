@@ -43,8 +43,8 @@ int main(int argc, char* args[]) {
 	// 	spp.show_data();
 	// #endif
 
-  double alpha = 3;
-	double beta = 2;
+  double alpha = 2;
+	double beta = 3;
 	double rho = 0.25;
 	double big_Q = 1;
 	unsigned max_it = 50;
