@@ -36,6 +36,10 @@ private:
 	// Solution cost
 	double cost;
 
+	// Flags
+	bool is_covered;
+	bool is_feasible;
+
 public:
 	// Constructors & destructor
 	solution();
@@ -60,7 +64,8 @@ public:
 	void show_data();
 	void show_latex( char*, char* );
 	double evaluate();
-  // bool is_used( unsigned );
+  bool is_covered();
+	bool is_feasible();
   // vector< unsigned > not_used();
 
 };
