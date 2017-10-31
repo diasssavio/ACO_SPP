@@ -32,8 +32,7 @@ class aco {
 private:
 	// Parameters
 	unsigned max_it;
-	double alpha, beta;
-	double big_Q;
+	double alpha, beta, rho, big_Q;
 
 	// Input instance
 	instance spp;
@@ -52,16 +51,17 @@ private:
 	// Utils
 	double get_heuristic( unsigned, unsigned );
 	void generate_ants();
+	void update_pheromones();
 
 	// Logs & seed
 	logger* logs;
-	unsigned long seed;
+	default_random_engine generator;
 
 public:
-	aco( instance&, unsigned, double, double, double, logger*, unsigned long );
+	aco( instance&, unsigned, double, double, double, double, logger*, default_random_engine& );
 	virtual ~aco();
 
-	solution& execute();
+	solution& run();
 
 };
 

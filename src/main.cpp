@@ -35,27 +35,25 @@ int main(int argc, char* args[]) {
 	// time_t seed = time(NULL);
 	// srand(seed);
 	init_genrand(seed);
+	default_random_engine generator(seed);
 
 	instance spp;
   spp.read_from_file(args[1]);
-	#if LOGS == true
-		spp.show_data();
-	#endif
+	// #if LOGS == true
+	// 	spp.show_data();
+	// #endif
 
-  double alpha = 1;
-	double beta = 1;
-	double big_Q = 0.5;
+  double alpha = 3;
+	double beta = 2;
+	double rho = 0.25;
+	double big_Q = 1;
 	unsigned max_it = 50;
 
-	unsigned n_neigh = 0;
-	if(argc >= 4)
-		n_neigh = string_to< unsigned >(args[3]) - 1;
-
 	logger* logs = new logger(timer);
-	aco ACO(spp, max_it, alpha, beta, big_Q, logs, seed);
+	aco ACO(spp, max_it, alpha, beta, rho, big_Q, logs, generator);
 
 	// Executing Ant Colony Optimization algorithm
-	solution best = ACO.execute();
+	solution best = ACO.run();
 	timer.stop();
 	// printf("%s;%d;%.2lf;%.2lf;%d;%.2lf;\n", args[1], n_neigh + 1, best.get_cost(), logs->best_time(), logs->get_individual_log(), logs->get_individual_average());
 
