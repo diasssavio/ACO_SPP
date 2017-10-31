@@ -37,14 +37,15 @@ private:
 	double cost;
 
 	// Flags
-	bool is_covered;
-	bool is_feasible;
+	bool covered;
+	bool feasible;
 
 public:
 	// Constructors & destructor
 	solution();
 	solution( instance& );
 	solution( solution& );
+	solution( instance&, vector< unsigned >, vector< unsigned >, double, bool, bool );
 	virtual ~solution();
 
 	// Setters
@@ -52,6 +53,8 @@ public:
 	void set_elems_represented( const vector< unsigned >& );
 	void set_sets_selected( const vector< unsigned >& );
 	void set_cost( double );
+	void set_covered( bool );
+	void set_feasible( bool );
 	// void set_set( unsigned );
 
 	// Getters

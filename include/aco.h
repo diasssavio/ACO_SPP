@@ -51,12 +51,14 @@ private:
 
 	// Utils
 	double get_heuristic( unsigned, unsigned );
+	void generate_ants();
 
-	// Logs
+	// Logs & seed
 	logger* logs;
+	unsigned long seed;
 
 public:
-	aco( instance&, unsigned, double, double, double, logger* );
+	aco( instance&, unsigned, double, double, double, logger*, unsigned long );
 	virtual ~aco();
 
 	solution& execute();

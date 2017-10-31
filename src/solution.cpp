@@ -14,7 +14,7 @@ solution::solution( instance& _spp ) {
 	spp = _spp;
 	elems_represented = vector< unsigned >(spp.get_n());
 	cost = numeric_limits< double >::max();
-	is_feasible = is_covered = false;
+	feasible = covered = false;
 }
 
 solution::solution( solution& _sol ) {
@@ -22,8 +22,14 @@ solution::solution( solution& _sol ) {
 	this->elems_represented = vector< unsigned >(_sol.get_elems_represented());
 	this->sets_selected = vector< unsigned >(_sol.get_sets_selected());
 	this->cost = _sol.get_cost();
-	this->is_covered = _sol.is_covered();
-	this->is_feasible = _sol.is_feasible();
+	this->covered = _sol.is_covered();
+	this->feasible = _sol.is_feasible();
+}
+
+solution::solution( instance& _spp, vector< unsigned > _elems, vector< unsigned > _sets, double _cost, bool _covered, bool _feasible ) : cost(_cost), covered(_covered), feasible(_feasible) {
+	spp = _spp;
+	elems_represented = _elems;
+	sets_selected = _sets;
 }
 
 solution::~solution() { }
@@ -35,6 +41,10 @@ void solution::set_elems_represented( const vector< unsigned >& _elems_represent
 void solution::set_sets_selected( const vector< unsigned >& _sets_selected ) { sets_selected = _sets_selected; }
 
 void solution::set_cost( double _cost ) { cost = _cost; }
+
+void solution::set_covered( bool _covered ) { covered = _covered; }
+
+void solution::set_feasible( bool _feasible ) { feasible = _feasible; }
 
 instance& solution::get_instance() { return spp; }
 
@@ -50,12 +60,15 @@ double solution::evaluate() {
 	return cost;
 }
 
-bool solution::is_covered() { return is_covered; }
+bool solution::is_covered() { return covered; }
 
-bool solution::is_feasible() { return is_feasible; }
+bool solution::is_feasible() { return feasible; }
 
 void solution::show_data() {
-	printf("SOLUTION DATA -------------------------- \n");
+	if(feasible)
+		printf("SOLUTION DATA ----------------- FEASIBLE \n");
+	else
+		printf("SOLUTION DATA --------------- INFEASIBLE \n");
 	printf("COST: %.2lf\n", cost);
 	printf("ELEMS REPRESENTED:\n");
 	for(unsigned i = 0; i < spp.get_n(); i++)

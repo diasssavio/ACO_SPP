@@ -52,10 +52,10 @@ int main(int argc, char* args[]) {
 		n_neigh = string_to< unsigned >(args[3]) - 1;
 
 	logger* logs = new logger(timer);
-	aco ACO(spp, max_it, alpha, beta, big_Q, logs);
+	aco ACO(spp, max_it, alpha, beta, big_Q, logs, seed);
 
 	// Executing Ant Colony Optimization algorithm
-	// solution best = ACO.execute();
+	solution best = ACO.execute();
 	timer.stop();
 	// printf("%s;%d;%.2lf;%.2lf;%d;%.2lf;\n", args[1], n_neigh + 1, best.get_cost(), logs->best_time(), logs->get_individual_log(), logs->get_individual_average());
 

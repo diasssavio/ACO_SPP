@@ -30,6 +30,8 @@ unsigned instance::get_n() { return this->n; }
 
 unsigned instance::get_m() { return this->m; }
 
+unsigned instance::get_big_M() { return this->big_M; }
+
 const vector< unsigned >& instance::get_weights() const { return this->weights; }
 
 const vector< vector < unsigned > >& instance::get_subsets() const { return this->subsets; }

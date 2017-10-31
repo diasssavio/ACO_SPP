@@ -8,7 +8,7 @@
 
 #include "../include/aco.h"
 
-aco::aco( instance& _spp, unsigned _it, double _alpha, double _beta, double _big_Q, logger* _logs ) : max_it(_it), alpha(_alpha), beta(_beta), big_Q(_big_Q) {
+aco::aco( instance& _spp, unsigned _it, double _alpha, double _beta, double _big_Q, logger* _logs, unsigned long _seed ) : max_it(_it), alpha(_alpha), beta(_beta), big_Q(_big_Q), seed(_seed) {
 	this->spp = _spp;
 	this->logs = _logs;
 
@@ -22,21 +22,14 @@ aco::aco( instance& _spp, unsigned _it, double _alpha, double _beta, double _big
 	// Initializing pheromones and heuristics informations
 	pheromones = vector< vector < double > >(m + 1);
 	heuristics = vector< vector < double > >(m + 1);
-
-	#if LOGS == true
-		printf("HEURISTICS INFO ------------------------\n");
-		for(unsigned i = 0; i <= m; i++) {
-			pheromones[i] = vector < double >(m + 1);
-			heuristics[i] = vector < double >(m + 1);
-			for(unsigned j = 0; j <= m; j++) {
-				pheromones[i][j] = 1.0;
-				heuristics[i][j] = -1.0;
-				printf("%.2lf ", heuristics[i][j]);
-			}
-			printf("\n");
+	for(unsigned i = 0; i <= m; i++) {
+		pheromones[i] = vector< double >(m + 1);
+		heuristics[i] = vector< double >(m + 1);
+		for(unsigned j = 0; j <= m; j++) {
+			pheromones[i][j] = 1.0;
+			heuristics[i][j] = -1.0;
 		}
-		printf("----------------------------------------\n");
-	#endif
+	}
 
 	// Generating neighborhood list based on every element from the set
 	neighbors = vector< vector< unsigned> >(n);
@@ -79,6 +72,74 @@ double aco::get_heuristic( unsigned i, unsigned j ) {
 	return heuristics[i][j];
 }
 
+void aco::generate_ants() {
+	unsigned n = spp.get_n();
+	unsigned m = spp.get_m();
+	unsigned big_M = spp.get_big_M();
+	vector < unsigned > weights = spp.get_weights();
+	vector< vector < unsigned > > subsets = spp.get_subsets();
+
+	for(unsigned i = 0; i < n; i++) {
+		vector< unsigned > elems(n);
+		vector< unsigned > sets;
+		double cost = 0.0;
+		unsigned k = i, origin = 0;
+		while(k < n) { // i.e. all elements are covered
+			// Calculating denominator of probability equation
+			double denominator = 0.0;
+			for(unsigned j = 0; j < neighbors[k].size(); j++)
+				denominator += pow(pheromones[origin][ neighbors[k][j] + 1 ], alpha) * pow(get_heuristic(origin, neighbors[k][j] + 1), beta);
+
+			// Calculating edges probabilities
+			vector< double > probs(neighbors[k].size());
+			for(unsigned j = 0; j < neighbors[k].size(); j++)
+				probs[j] = pow(pheromones[origin][ neighbors[k][j] + 1 ], alpha) * pow(get_heuristic(origin, neighbors[k][j] + 1), beta) / denominator;
+
+			// Choosing which set to add (edge to take)
+			default_random_engine generator(seed);
+			discrete_distribution<> distribution(probs.begin(), probs.end());
+			origin = neighbors[k][ distribution(generator) ] + 1;
+			cost += weights[origin - 1];
+			sets.push_back(origin);
+
+			// Updating covered elements list based on set taken
+			for(unsigned j = 0; j < subsets[origin - 1]. size(); j++) elems[ subsets[origin - 1][j] - 1 ]++;
+			for(k = 0; k < n; k++)
+				if(!elems[k])	break;
+
+			// #if LOGS == true
+			// 	printf("Set choosen: %d\nCurrent elems covered: ", origin);
+			// 	for(unsigned j = 0; j < n; j++) printf("%4d", elems[j]);
+			// 	printf("\nSets selected: ");
+			// 	for(unsigned j = 0; j < sets.size(); j++) printf("%4d", sets[j]);
+			// 	printf("\n");
+			// #endif
+		}
+
+		// Saving constructed solution in ant pool
+		unsigned bar_s = 0;
+		for(unsigned j = 0; j < n; j++)
+			bar_s += elems[j] - 1;
+		cost += big_M * bar_s;
+		ants[i] = solution(spp, elems, sets, cost, true, !bar_s);
+
+		#if LOGS == true
+			printf("Ant #%d\n", i + 1);
+			ants[i].show_data();
+		#endif
+	}
+
+	#if LOGS == true
+		printf("HEURISTICS INFO ------------------------\n");
+		for(unsigned i = 0; i <= m; i++) {
+			for(unsigned j = 0; j <= m; j++)
+				printf("%.2lf ", heuristics[i][j]);
+			printf("\n");
+		}
+		printf("----------------------------------------\n");
+	#endif
+}
+
 solution& aco::execute() {
 	unsigned n = spp.get_n();
 	unsigned m = spp.get_m();
@@ -88,10 +149,8 @@ solution& aco::execute() {
 
 	unsigned it_count = 0;
 	while( it_count < max_it ) {
-		// TODO Generating every ant solution
-		for(unsigned i = 0; i < n; i++) {
-			vector< unsigned > adj = neighbors[i];
-		}
+		// Generating every ant solution
+		generate_ants();
 
 		// TODO Updating pheromones
 
