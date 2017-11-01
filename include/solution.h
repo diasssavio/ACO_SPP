@@ -37,6 +37,7 @@ private:
 	double cost;
 
 	// Flags
+	unsigned bar_s;
 	bool covered;
 	bool feasible;
 
@@ -45,7 +46,7 @@ public:
 	solution();
 	solution( instance& );
 	solution( solution& );
-	solution( instance&, vector< unsigned >, vector< unsigned >, double, bool, bool );
+	solution( instance&, vector< unsigned >, vector< unsigned >, double, unsigned, bool, bool );
 	virtual ~solution();
 
 	// Setters
@@ -53,6 +54,7 @@ public:
 	void set_elems_represented( const vector< unsigned >& );
 	void set_sets_selected( const vector< unsigned >& );
 	void set_cost( double );
+	void set_bar_s( unsigned );
 	void set_covered( bool );
 	void set_feasible( bool );
 	// void set_set( unsigned );
@@ -62,6 +64,7 @@ public:
 	const vector< unsigned >& get_elems_represented() const;
 	const vector< unsigned >& get_sets_selected() const;
 	double get_cost();
+	unsigned get_bar_s();
 
 	// Useful Methods
 	void show_data();
@@ -69,6 +72,8 @@ public:
 	double evaluate();
   bool is_covered();
 	bool is_feasible();
+	void remove_subset( unsigned );
+	void insert_subset( unsigned );
   // vector< unsigned > not_used();
 
 };

@@ -8,7 +8,7 @@
 
 #include "../include/aco.h"
 
-aco::aco( instance& _spp, unsigned _it, double _alpha, double _beta, double _rho, double _big_Q, logger* _logs, default_random_engine& _generator ) : max_it(_it), alpha(_alpha), beta(_beta), rho(_rho), big_Q(_big_Q) {
+aco::aco( instance& _spp, unsigned _it, double _alpha, double _beta, double _rho, double _big_Q, logger* _logs, mt19937& _generator ) : max_it(_it), alpha(_alpha), beta(_beta), rho(_rho), big_Q(_big_Q) {
 	this->spp = _spp;
 	this->logs = _logs;
 	this->generator = _generator;
@@ -68,7 +68,9 @@ double aco::get_heuristic( unsigned i, unsigned j ) {
 		set< unsigned > union_set(spp.get_subset(i - 1).begin(), spp.get_subset(i - 1).end());
 		union_set.insert(spp.get_subset(j - 1).begin(), spp.get_subset(j - 1).end());
 		double intersec_size = spp.get_subset(i - 1).size() + spp.get_subset(j - 1).size() - union_set.size();
-		heuristics[i][j] = (spp.get_weight(i - 1) + spp.get_weight(j - 1) + spp.get_big_M() * intersec_size) / (double)union_set.size();
+		double partition_sum = spp.get_weight(i - 1) + spp.get_weight(j - 1);
+		heuristics[i][j] = (partition_sum + spp.get_big_M() * intersec_size) / (double)union_set.size();
+		// heuristics[i][j] = (partition_sum + partition_sum * intersec_size) / (double)union_set.size();
 		heuristics[i][j] = 1.0 / heuristics[i][j];
 	}
 	return heuristics[i][j];
@@ -122,12 +124,7 @@ void aco::generate_ants() {
 		for(unsigned j = 0; j < n; j++)
 			bar_s += elems[j] - 1;
 		cost += big_M * bar_s;
-		ants[i] = solution(spp, elems, sets, cost, true, !bar_s);
-
-		#if LOGS == true
-			printf("Ant #%d\n", i + 1);
-			ants[i].show_data();
-		#endif
+		ants[i] = solution(spp, elems, sets, cost, bar_s, true, !bar_s);
 	}
 }
 
@@ -153,10 +150,43 @@ void aco::update_pheromones() {
 	}
 }
 
+void aco::feasibility_heuristic() {
+	unsigned n = spp.get_n();
+	unsigned m = spp.get_m();
+	vector < unsigned > weights = spp.get_weights();
+	vector< vector < unsigned > > subsets = spp.get_subsets();
+
+	// Trying to make every unfeasible solution feasible
+	for(unsigned k = 0; k < n; k++) {
+		if(ants[k].is_feasible()) continue;
+		vector< unsigned > sets(ants[k].get_sets_selected());
+
+		// Step 1: Remove subsets of over-covered elements
+		while(sets.size() > 0) {
+			vector< unsigned > elems = ants[k].get_elems_represented();
+			unsigned j = genrand_int32() % sets.size();
+
+			// Verifying whether the selected subset makes any infeasibility
+			bool makes_infeasible = false;
+			for(unsigned i = 0; i < subsets[ sets[j] - 1 ].size(); i++)
+				if(elems[ subsets[ sets[j] - 1 ][i] - 1 ] >= 2) {
+					makes_infeasible = true;
+					break;
+				}
+			// Removing subset if positive
+			if(makes_infeasible)
+				ants[k].remove_subset(sets[j]);
+
+			sets.erase(sets.begin() + j);
+		}
+
+		// TODO Step 2: Add subsets as long as it doesn't over-cover any element
+	}
+}
+
 solution& aco::run() {
 	unsigned n = spp.get_n();
 	unsigned m = spp.get_m();
-	unsigned big_M = spp.get_big_M();
 
 	unsigned it_count = 0;
 	while( it_count < max_it ) {
@@ -178,12 +208,35 @@ solution& aco::run() {
 		#endif
 
 		// Generating every ant solution
+		#if LOGS == true
+			printf("GENERATING ANTS ------------------------\n");
+		#endif
 		generate_ants();
+
+		#if LOGS == true
+			for(unsigned i = 0; i < n; i++) {
+				printf("Ant #%d\n", i + 1);
+				ants[i].show_data();
+			}
+		#endif
+
+		// Running feasibility heuristic
+		#if LOGS == true
+			printf("FEASIBILITY HEURISTIC ------------------\n");
+		#endif
+		feasibility_heuristic();
+
+		#if LOGS == true
+			for(unsigned i = 0; i < n; i++) {
+				printf("Ant #%d\n", i + 1);
+				ants[i].show_data();
+			}
+		#endif
 
 		// Updating pheromones
 		update_pheromones();
 
-		// getchar();
+		getchar();
 		++it_count;
 	}
 

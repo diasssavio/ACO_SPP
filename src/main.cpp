@@ -35,7 +35,8 @@ int main(int argc, char* args[]) {
 	// time_t seed = time(NULL);
 	// srand(seed);
 	init_genrand(seed);
-	default_random_engine generator(seed);
+	// default_random_engine generator(seed);
+	mt19937 generator(seed);
 
 	instance spp;
   spp.read_from_file(args[1]);

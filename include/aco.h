@@ -52,13 +52,14 @@ private:
 	double get_heuristic( unsigned, unsigned );
 	void generate_ants();
 	void update_pheromones();
+	void feasibility_heuristic();
 
 	// Logs & seed
 	logger* logs;
-	default_random_engine generator;
+	mt19937 generator;
 
 public:
-	aco( instance&, unsigned, double, double, double, double, logger*, default_random_engine& );
+	aco( instance&, unsigned, double, double, double, double, logger*, mt19937& );
 	virtual ~aco();
 
 	solution& run();

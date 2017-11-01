@@ -13,8 +13,9 @@ solution::solution() { }
 solution::solution( instance& _spp ) {
 	spp = _spp;
 	elems_represented = vector< unsigned >(spp.get_n());
-	cost = numeric_limits< double >::max();
 	feasible = covered = false;
+	bar_s = spp.get_n();
+	cost = bar_s * spp.get_big_M();
 }
 
 solution::solution( solution& _sol ) {
@@ -24,9 +25,10 @@ solution::solution( solution& _sol ) {
 	this->cost = _sol.get_cost();
 	this->covered = _sol.is_covered();
 	this->feasible = _sol.is_feasible();
+	this->bar_s = _sol.get_bar_s();
 }
 
-solution::solution( instance& _spp, vector< unsigned > _elems, vector< unsigned > _sets, double _cost, bool _covered, bool _feasible ) : cost(_cost), covered(_covered), feasible(_feasible) {
+solution::solution( instance& _spp, vector< unsigned > _elems, vector< unsigned > _sets, double _cost, unsigned _bar_s, bool _covered, bool _feasible ) : cost(_cost), bar_s(_bar_s), covered(_covered), feasible(_feasible) {
 	spp = _spp;
 	elems_represented = _elems;
 	sets_selected = _sets;
@@ -42,6 +44,8 @@ void solution::set_sets_selected( const vector< unsigned >& _sets_selected ) { s
 
 void solution::set_cost( double _cost ) { cost = _cost; }
 
+void solution::set_bar_s( unsigned _bar_s ) { bar_s = _bar_s; }
+
 void solution::set_covered( bool _covered ) { covered = _covered; }
 
 void solution::set_feasible( bool _feasible ) { feasible = _feasible; }
@@ -54,6 +58,8 @@ const vector< unsigned >& solution::get_sets_selected() const { return sets_sele
 
 double solution::get_cost() { return cost; }
 
+unsigned solution::get_bar_s() { return bar_s; }
+
 double solution::evaluate() {
 	// TODO
 
@@ -64,12 +70,39 @@ bool solution::is_covered() { return covered; }
 
 bool solution::is_feasible() { return feasible; }
 
+void solution::remove_subset( unsigned subset ) {
+	unsigned n = spp.get_n();
+	unsigned big_M = spp.get_big_M();
+	vector < unsigned > weights = spp.get_weights();
+	vector< vector < unsigned > > subsets = spp.get_subsets();
+
+	// Reducing costs, represetation and checking cover flags
+	for(unsigned i = 0; i < subsets[ subset - 1 ].size(); i++) {
+		if(elems_represented[ subsets[ subset - 1 ][i] - 1 ] >= 2) {
+			cost -= big_M;
+			bar_s--;
+		} else if(elems_represented[ subsets[ subset - 1 ][i] - 1 ] == 1) {
+			cost += big_M;
+			bar_s++;
+			covered = false;
+		}
+		elems_represented[ subsets[ subset - 1 ][i] - 1 ]--;
+	}
+	feasible = !bar_s;
+	cost -= weights[ subset - 1 ];
+	sets_selected.erase(find(sets_selected.begin(), sets_selected.end(), subset));
+}
+
+void solution::insert_subset( unsigned subset ) {
+
+}
+
 void solution::show_data() {
 	if(feasible)
 		printf("SOLUTION DATA ----------------- FEASIBLE \n");
 	else
 		printf("SOLUTION DATA --------------- INFEASIBLE \n");
-	printf("COST: %.2lf\n", cost);
+	printf("COST: %.2lf ---- BAR_S: %2d\n", cost, bar_s);
 	printf("ELEMS REPRESENTED:\n");
 	for(unsigned i = 0; i < spp.get_n(); i++)
 		printf("%4d", elems_represented[i]);
