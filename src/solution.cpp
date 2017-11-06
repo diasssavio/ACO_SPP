@@ -94,7 +94,32 @@ void solution::remove_subset( unsigned subset ) {
 }
 
 void solution::insert_subset( unsigned subset ) {
+	unsigned n = spp.get_n();
+	unsigned big_M = spp.get_big_M();
+	vector < unsigned > weights = spp.get_weights();
+	vector< vector < unsigned > > subsets = spp.get_subsets();
 
+	for(unsigned i = 0; i < subsets[ subset - 1].size(); i++) {
+		if(elems_represented[ subsets[ subset - 1][i] - 1 ] >= 1) {
+			cost += big_M;
+			bar_s++;
+		} else if(elems_represented[ subsets[ subset - 1][i] - 1 ] == 0) {
+			cost -= big_M;
+			bar_s--;
+		}
+		elems_represented[ subsets[ subset - 1][i] - 1 ]++;
+	}
+	feasible = !bar_s;
+	if(feasible) covered = true;
+	else {
+		for(unsigned i = 0; i < n; i++)
+			if(!elems_represented[i]) {
+				covered = false;
+				break;
+			}
+	}
+	cost += weights[ subset - 1 ];
+	sets_selected.push_back( subset - 1 );
 }
 
 void solution::show_data() {

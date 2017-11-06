@@ -45,7 +45,7 @@ private:
 	vector< vector< double > > heuristics;
 	vector< solution > ants;
 
-	// Neighbors
+	// Neighbors -- List of subsets that cover every element
 	vector< vector< unsigned > > neighbors;
 
 	// Utils

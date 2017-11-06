@@ -41,16 +41,6 @@ aco::aco( instance& _spp, unsigned _it, double _alpha, double _beta, double _rho
 				adj.push_back(j);
 		neighbors[i] = adj;
 	}
-
-	// #if LOGS == true
-	// 	printf("NEIGHBORS LIST --------------------------\n");
-	// 	for(unsigned i = 0; i < n; i++) {
-	// 		for(unsigned j = 0; j < neighbors[i].size(); j++)
-	// 			printf("%4d", neighbors[i][j]);
-	// 		printf("\n");
-	// 	}
-	// 	printf("----------------------------------------\n");
-	// #endif
 }
 
 aco::~aco() { }
@@ -180,7 +170,54 @@ void aco::feasibility_heuristic() {
 			sets.erase(sets.begin() + j);
 		}
 
-		// TODO Step 2: Add subsets as long as it doesn't over-cover any element
+		// Step 2: Add subsets as long as it doesn't over-cover any element
+		// Building initial sets for heuristic
+		vector< unsigned > elems = ants[k].get_elems_represented();
+		set< unsigned > set_U;
+		for(unsigned i = 0; i < n; i++)
+			if(!elems[i])
+				set_U.insert(i + 1);
+		vector< unsigned > set_V(set_U.begin(), set_U.end());
+
+		// Trying to add subsets based on under-covered elements
+		while(set_V.size() > 0) {
+			unsigned i = genrand_int32() % set_V.size();
+			unsigned _i = set_V[i] - 1;
+			set_V.erase(set_V.begin() + i);
+
+			// Checking the minimum subset which covers uncovered elements only
+			int j = -1;
+			double s_value = MAX_DOUBLE;
+			for(unsigned y = 0; y < neighbors[_i].size(); y++) {
+				vector< unsigned > _subset = subsets[ neighbors[_i][y] ];
+				bool is_subset = true;
+				if(_subset.size() > set_U.size()) continue;
+				for(unsigned x = 0; x < _subset.size(); x++)
+					if(find(set_U.begin(), set_U.end(), _subset[x]) == set_U.end()) {
+						is_subset = false;
+						break;
+					}
+
+				if(is_subset) { // if neighbors[_i][y] \subseteq set_U
+					double cost = (double) weights[ neighbors[_i][y] ] / (double) _subset.size();
+					if(cost < s_value) {
+						j = neighbors[_i][y];
+						s_value = cost;
+					}
+				}
+			}
+
+			// Found a subset, adding it to the solution
+			if(j >= 0) {
+				ants[k].insert_subset(j + 1);
+				for(unsigned x = 0; x < subsets[j].size(); x++) {
+					set_U.erase(subsets[j][x]);
+					vector< unsigned >::iterator it = find(set_V.begin(), set_V.end(), subsets[j][x]);
+					if(it != set_V.end())
+						set_V.erase(it);
+				}
+			}
+		}
 	}
 }
 
@@ -236,7 +273,7 @@ solution& aco::run() {
 		// Updating pheromones
 		update_pheromones();
 
-		getchar();
+		// getchar();
 		++it_count;
 	}
 

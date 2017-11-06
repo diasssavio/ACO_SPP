@@ -48,7 +48,7 @@ int main(int argc, char* args[]) {
 	double beta = 3;
 	double rho = 0.25;
 	double big_Q = 1;
-	unsigned max_it = 50;
+	unsigned max_it = 5;
 
 	logger* logs = new logger(timer);
 	aco ACO(spp, max_it, alpha, beta, rho, big_Q, logs, generator);
