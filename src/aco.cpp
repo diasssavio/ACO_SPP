@@ -12,6 +12,7 @@ aco::aco( instance& _spp, unsigned _it, double _alpha, double _beta, double _rho
 	this->spp = _spp;
 	this->logs = _logs;
 	this->generator = _generator;
+	this->best = NULL;
 
 	unsigned n = spp.get_n();
 	unsigned m = spp.get_m();
@@ -79,15 +80,10 @@ void aco::generate_ants() {
 		double cost = 0.0;
 		unsigned k = i, origin = 0;
 		while(k < n) { // i.e. all elements are covered
-			// Calculating denominator of probability equation
-			// double denominator = 0.0;
-			// for(unsigned j = 0; j < neighbors[k].size(); j++)
-			// 	denominator += pow(pheromones[origin][ neighbors[k][j] + 1 ], alpha) * pow(get_heuristic(origin, neighbors[k][j] + 1), beta);
-
 			// Calculating edges probabilities
 			vector< double > probs(neighbors[k].size());
 			for(unsigned j = 0; j < neighbors[k].size(); j++)
-				probs[j] = pow(pheromones[origin][ neighbors[k][j] + 1 ], alpha) * pow(get_heuristic(origin, neighbors[k][j] + 1), beta); // denominator;
+				probs[j] = pow(pheromones[origin][ neighbors[k][j] + 1 ], alpha) * pow(get_heuristic(origin, neighbors[k][j] + 1), beta);
 
 			// Choosing which set to add (edge to take)
 			discrete_distribution< int > distribution(probs.begin(), probs.end());
@@ -99,14 +95,6 @@ void aco::generate_ants() {
 			for(unsigned j = 0; j < subsets[origin - 1]. size(); j++) elems[ subsets[origin - 1][j] - 1 ]++;
 			for(k = 0; k < n; k++)
 				if(!elems[k])	break;
-
-			// #if LOGS == true
-			// 	printf("Set choosen: %d\nCurrent elems covered: ", origin);
-			// 	for(unsigned j = 0; j < n; j++) printf("%4d", elems[j]);
-			// 	printf("\nSets selected: ");
-			// 	for(unsigned j = 0; j < sets.size(); j++) printf("%4d", sets[j]);
-			// 	printf("\n");
-			// #endif
 		}
 
 		// Saving constructed solution in ant pool
@@ -115,6 +103,8 @@ void aco::generate_ants() {
 			bar_s += elems[j] - 1;
 		cost += big_M * bar_s;
 		ants[i] = solution(spp, elems, sets, cost, bar_s, true, !bar_s);
+
+		is_best(&ants[i]);
 	}
 }
 
@@ -218,52 +208,67 @@ void aco::feasibility_heuristic() {
 				}
 			}
 		}
+
+		is_best(&ants[k]);
 	}
 }
 
-solution& aco::run() {
+void aco::is_best( solution* candidate ) {
+	if(!best) best = new solution(*candidate);
+	else if(!best->is_feasible()) {
+		if(candidate->is_feasible() || (best->get_cost() > candidate->get_cost()))
+			best = new solution(*candidate);
+	} else if(candidate->is_feasible() && (best->get_cost() > candidate->get_cost()))
+			best = new solution(*candidate);
+}
+
+solution* aco::run() {
 	unsigned n = spp.get_n();
 	unsigned m = spp.get_m();
 
 	unsigned it_count = 0;
 	while( it_count < max_it ) {
 		#if LOGS == true
-			printf("HEURISTICS INFO ------------------------\n");
-			for(unsigned i = 0; i <= m; i++) {
-				for(unsigned j = 0; j <= m; j++)
-				printf("%.2lf ", heuristics[i][j]);
-				printf("\n");
-			}
-			printf("----------------------------------------\n");
-			printf("PHEROMONES INFO ------------------------\n");
-			for(unsigned i = 0; i <= m; i++) {
-				for(unsigned j = 0; j <= m; j++)
-				printf("%.2lf ", pheromones[i][j]);
-				printf("\n");
-			}
-			printf("----------------------------------------\n");
+			printf("ITERATION #%2d --------------------------\n", it_count + 1);
+			// printf("HEURISTICS INFO ------------------------\n");
+			// for(unsigned i = 0; i <= m; i++) {
+			// 	for(unsigned j = 0; j <= m; j++)
+			// 	printf("%.2lf ", heuristics[i][j]);
+			// 	printf("\n");
+			// }
+			// printf("----------------------------------------\n");
+			// printf("PHEROMONES INFO ------------------------\n");
+			// for(unsigned i = 0; i <= m; i++) {
+			// 	for(unsigned j = 0; j <= m; j++)
+			// 	printf("%.2lf ", pheromones[i][j]);
+			// 	printf("\n");
+			// }
+			// printf("----------------------------------------\n");
 		#endif
 
 		// Generating every ant solution
 		#if LOGS == true
-			printf("GENERATING ANTS ------------------------\n");
+			// printf("GENERATING ANTS ------------------------\n");
 		#endif
 		generate_ants();
 
 		#if LOGS == true
-			for(unsigned i = 0; i < n; i++) {
-				printf("Ant #%d\n", i + 1);
-				ants[i].show_data();
-			}
+			// for(unsigned i = 0; i < n; i++) {
+			// 	printf("Ant #%d\n", i + 1);
+			// 	ants[i].show_data();
+			// }
 		#endif
+
 
 		// Running feasibility heuristic
 		#if LOGS == true
-			printf("FEASIBILITY HEURISTIC ------------------\n");
+			// best->show_data();
+			// printf("FEASIBILITY HEURISTIC ------------------\n");
 		#endif
 		feasibility_heuristic();
 
 		#if LOGS == true
+			// best->show_data();
 			for(unsigned i = 0; i < n; i++) {
 				printf("Ant #%d\n", i + 1);
 				ants[i].show_data();

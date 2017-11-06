@@ -21,6 +21,7 @@
 #include <fstream>
 
 #include "instance.h"
+#include "typedef.hpp"
 
 using namespace std;
 

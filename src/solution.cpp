@@ -8,7 +8,7 @@
 
 #include "../include/solution.h"
 
-solution::solution() { }
+solution::solution() : cost(MAX_DOUBLE) {}
 
 solution::solution( instance& _spp ) {
 	spp = _spp;

@@ -45,7 +45,7 @@ int main(int argc, char* args[]) {
 	// #endif
 
   double alpha = 2;
-	double beta = 3;
+	double beta = 2;
 	double rho = 0.25;
 	double big_Q = 1;
 	unsigned max_it = 5;
@@ -54,8 +54,11 @@ int main(int argc, char* args[]) {
 	aco ACO(spp, max_it, alpha, beta, rho, big_Q, logs, generator);
 
 	// Executing Ant Colony Optimization algorithm
-	solution best = ACO.run();
+	solution* best = ACO.run();
 	timer.stop();
+	printf("BEST SOLUTION FOUND -------------------- \n");
+	printf("Total execution time: %.2lf\n", timer.getStopTime());
+	best->show_data();
 	// printf("%s;%d;%.2lf;%.2lf;%d;%.2lf;\n", args[1], n_neigh + 1, best.get_cost(), logs->best_time(), logs->get_individual_log(), logs->get_individual_average());
 
 	return 0;

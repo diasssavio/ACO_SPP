@@ -38,7 +38,7 @@ private:
 	instance spp;
 
 	// Result best solution
-	solution best;
+	solution* best;
 
 	// ACO data
 	vector< vector< double > > pheromones;
@@ -53,6 +53,7 @@ private:
 	void generate_ants();
 	void update_pheromones();
 	void feasibility_heuristic();
+	void is_best( solution* );
 
 	// Logs & seed
 	logger* logs;
@@ -62,7 +63,7 @@ public:
 	aco( instance&, unsigned, double, double, double, double, logger*, mt19937& );
 	virtual ~aco();
 
-	solution& run();
+	solution* run();
 
 };
 
