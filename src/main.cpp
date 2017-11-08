@@ -46,9 +46,15 @@ int main(int argc, char* args[]) {
 
   double alpha = 2;
 	double beta = 2;
-	double rho = 0.25;
+	double rho = 0.2;
 	double big_Q = 1;
-	unsigned max_it = 5;
+	unsigned max_it = 50;
+	if(argc >= 4) {
+		alpha = string_to< double >(args[3]);
+		beta = string_to< double >(args[4]);
+		rho = string_to< double >(args[5]);
+		big_Q = string_to< double >(args[6]);
+	}
 
 	logger* logs = new logger(timer);
 	aco ACO(spp, max_it, alpha, beta, rho, big_Q, logs, generator);
@@ -56,10 +62,17 @@ int main(int argc, char* args[]) {
 	// Executing Ant Colony Optimization algorithm
 	solution* best = ACO.run();
 	timer.stop();
+
+	// Logging output data
 	printf("BEST SOLUTION FOUND -------------------- \n");
-	printf("Total execution time: %.2lf\n", timer.getStopTime());
+	printf("BEST TIME (TOTAL): %.2lf (%.2lf)\n", logs->best_time(), timer.getStopTime());
+	printf("SEED: %ld\n", seed);
 	best->show_data();
-	// printf("%s;%d;%.2lf;%.2lf;%d;%.2lf;\n", args[1], n_neigh + 1, best.get_cost(), logs->best_time(), logs->get_individual_log(), logs->get_individual_average());
+	logs->print_log();
+
+	FILE* _file = fopen("results.csv", "a+");
+	if(_file)
+		fprintf(_file, "%s;%ld;%.2lf;%d;%.2lf;%.2lf\n", args[1], seed, best->get_cost(), best->is_feasible(), logs->best_time(), timer.getStopTime());
 
 	return 0;
 }

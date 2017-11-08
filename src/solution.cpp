@@ -127,13 +127,13 @@ void solution::show_data() {
 		printf("SOLUTION DATA ----------------- FEASIBLE \n");
 	else
 		printf("SOLUTION DATA --------------- INFEASIBLE \n");
-	printf("COST: %.2lf ---- BAR_S: %2d\n", cost, bar_s);
-	printf("ELEMS REPRESENTED:\n");
+	printf("COST: %.2lf\n", cost);
+	printf("ELEMS REPRESENTED (BAR_S = %d):\n", bar_s);
 	for(unsigned i = 0; i < spp.get_n(); i++)
-		printf("%4d", elems_represented[i]);
-	printf("\nSETS SELECTED:\n");
+		printf("%2d", elems_represented[i]);
+	printf("\nSETS SELECTED (%d):\n", sets_selected.size());
 	for(unsigned i = 0; i < sets_selected.size(); i++)
-		printf("%4d", sets_selected[i]);
+		printf("%d ", sets_selected[i]);
 	printf("\n");
 	printf(" --------------------------------------- \n");
 }

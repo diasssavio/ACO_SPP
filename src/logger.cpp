@@ -52,7 +52,7 @@ void logger::make_general_log( unsigned i, double initial, double improved ) {
 }
 
 void logger::print_log() {
-	printf("MULTI-START ITERATION LOGS:\n");
+	printf("ITERATION LOGS -------------------------\n");
 	for(unsigned i = 0; i < it_log.size(); i++)
 		printf("%d: Cost: %.2lf\tTime:%.2lf\n", it_log[i].second, it_log[i].first, times[i]);
 }

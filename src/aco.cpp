@@ -230,45 +230,15 @@ solution* aco::run() {
 	while( it_count < max_it ) {
 		#if LOGS == true
 			printf("ITERATION #%2d --------------------------\n", it_count + 1);
-			// printf("HEURISTICS INFO ------------------------\n");
-			// for(unsigned i = 0; i <= m; i++) {
-			// 	for(unsigned j = 0; j <= m; j++)
-			// 	printf("%.2lf ", heuristics[i][j]);
-			// 	printf("\n");
-			// }
-			// printf("----------------------------------------\n");
-			// printf("PHEROMONES INFO ------------------------\n");
-			// for(unsigned i = 0; i <= m; i++) {
-			// 	for(unsigned j = 0; j <= m; j++)
-			// 	printf("%.2lf ", pheromones[i][j]);
-			// 	printf("\n");
-			// }
-			// printf("----------------------------------------\n");
 		#endif
 
 		// Generating every ant solution
-		#if LOGS == true
-			// printf("GENERATING ANTS ------------------------\n");
-		#endif
 		generate_ants();
 
-		#if LOGS == true
-			// for(unsigned i = 0; i < n; i++) {
-			// 	printf("Ant #%d\n", i + 1);
-			// 	ants[i].show_data();
-			// }
-		#endif
-
-
 		// Running feasibility heuristic
-		#if LOGS == true
-			// best->show_data();
-			// printf("FEASIBILITY HEURISTIC ------------------\n");
-		#endif
 		feasibility_heuristic();
 
 		#if LOGS == true
-			// best->show_data();
 			for(unsigned i = 0; i < n; i++) {
 				printf("Ant #%d\n", i + 1);
 				ants[i].show_data();
@@ -277,8 +247,7 @@ solution* aco::run() {
 
 		// Updating pheromones
 		update_pheromones();
-
-		// getchar();
+		logs->make_log(best->get_cost());
 		++it_count;
 	}
 

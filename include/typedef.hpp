@@ -4,7 +4,7 @@
 #define MAX_DOUBLE 1e+75
 #define EPSILON 1e-5
 
-#define LOGS true
+#define LOGS false
 
 #include <sstream>
 
