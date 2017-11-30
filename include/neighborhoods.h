@@ -40,6 +40,8 @@ public:
 	virtual ~neighborhoods();
 
 	solution swap11( solution& );
+	solution swap12( solution& );
+	solution swap21( solution& );
 	solution swap22( solution& );
 
 	solution& execute( solution& );

@@ -243,14 +243,15 @@ solution* aco::run() {
 		feasibility_heuristic();
 
 		#if LOGS == true
-			for(unsigned i = 0; i < n; i++) {
-				printf("Ant #%d\n", i + 1);
-				ants[i].show_data();
-			}
+			// for(unsigned i = 0; i < n; i++) {
+			// 	printf("Ant #%d\n", i + 1);
+			// 	ants[i].show_data();
+			// }
 			printf("BEST: %.2lf\n", best->get_cost());
 		#endif
 
-		solution aux = neighbors.execute(*min_element(ants.begin(), ants.end(), comp_ants));
+		solution aux = neighbors.execute(ants[genrand_int32() % ants.size()]);
+		// solution aux = neighbors.execute(*min_element(ants.begin(), ants.end(), comp_ants));
 		is_best(&aux);
 
 		#if LOGS == true
