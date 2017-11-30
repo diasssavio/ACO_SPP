@@ -26,20 +26,21 @@ int myrandom( unsigned );
 class neighborhoods {
 private:
 	// Input instance
-	instance cars;
+	instance spp;
 
-	vector< unsigned > i_NL;
-	vector< unsigned > o_NL;
+	vector< unsigned > NL;
 
-	bool logs;
 	logger* log_system;
 
 	// Result best solution
 	solution best;
 
 public:
-	neighborhoods( instance&, logger* = NULL, bool = false );
+	neighborhoods( instance&, logger* = NULL );
 	virtual ~neighborhoods();
+
+	solution swap11( solution& );
+	solution swap22( solution& );
 
 	solution& execute( solution& );
 

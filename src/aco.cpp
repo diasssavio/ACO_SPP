@@ -8,6 +8,8 @@
 
 #include "../include/aco.h"
 
+bool comp_ants(solution& i, solution& j) { return i.get_cost() < j.get_cost(); }
+
 aco::aco( instance& _spp, unsigned _it, double _alpha, double _beta, double _rho, double _big_Q, logger* _logs, mt19937& _generator ) : max_it(_it), alpha(_alpha), beta(_beta), rho(_rho), big_Q(_big_Q) {
 	this->spp = _spp;
 	this->logs = _logs;
@@ -226,6 +228,8 @@ solution* aco::run() {
 	unsigned n = spp.get_n();
 	unsigned m = spp.get_m();
 
+	neighborhoods neighbors(spp, logs);
+
 	unsigned it_count = 0;
 	while( it_count < max_it ) {
 		#if LOGS == true
@@ -243,12 +247,21 @@ solution* aco::run() {
 				printf("Ant #%d\n", i + 1);
 				ants[i].show_data();
 			}
+			printf("BEST: %.2lf\n", best->get_cost());
+		#endif
+
+		solution aux = neighbors.execute(*min_element(ants.begin(), ants.end(), comp_ants));
+		is_best(&aux);
+
+		#if LOGS == true
+			printf("BEST: %.2lf\n", best->get_cost());
 		#endif
 
 		// Updating pheromones
 		update_pheromones();
 		logs->make_log(best->get_cost());
 		++it_count;
+		// getchar();
 	}
 
 	return best;

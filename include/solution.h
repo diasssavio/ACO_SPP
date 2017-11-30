@@ -32,7 +32,7 @@ private:
 
 	// Solution itself
 	vector< unsigned > elems_represented; // Size: n
-	vector< unsigned > sets_selected;
+	vector< unsigned > sets_selected; // Ranging from [1, m]
 
 	// Solution cost
 	double cost;
